@@ -195,6 +195,7 @@ class WorkspaceTimeTracker {
             position: 'fixed',
             top: '15%',
             right: '0',
+            color: 'black',
             transform: 'translateY(-50%)',
             zIndex: '99999',
             background: '#fff',
