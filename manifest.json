@@ -1,0 +1,14 @@
+{
+    "manifest_version": 3,
+    "name": "Workspace Extra Time Calculator",
+    "version": "1.0.1",
+    "description": "Shows how many extra minutes you have beyond required average time.",
+    "permissions": ["activeTab", "scripting"],
+    "content_scripts": [
+      {
+        "matches": ["https://workspace.tatvasoft.com/time-log/self"],
+        "js": ["content.js"]
+      }
+    ]
+  }
+  
