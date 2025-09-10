@@ -55,7 +55,7 @@ class WorkspaceTimeTracker {
      * @returns {boolean}
      */
     isOnTargetPage() {
-        return window.location.href === this.config.TARGET_URL;
+        return window.location.href.includes(this.config.TARGET_URL);;
     }
 
     /**
@@ -90,6 +90,21 @@ class WorkspaceTimeTracker {
         const mins = absoluteMinutes % 60;
         
         return `${sign}${hours}:${mins.toString().padStart(2, '0')}`;
+    }
+
+    /**
+     * Check URL every 1 second for SPA navigation changes
+     */
+    startUrlWatcher() {
+        if (this.urlCheckInterval) clearInterval(this.urlCheckInterval);
+        
+        this.urlCheckInterval = setInterval(() => {
+            const currentUrl = window.location.href;
+            if (this.lastKnownUrl !== currentUrl) {
+                this.lastKnownUrl = currentUrl;
+                window.dispatchEvent(new Event('locationchange'));
+            }
+        }, 1000);
     }
 
     /**
@@ -451,7 +466,7 @@ class WorkspaceTimeTracker {
                     break;
             }
         });
-        
+      
         this.state.eventListeners.clear();
     }
 
@@ -610,6 +625,8 @@ class WorkspaceTimeTracker {
         });
         
         window.addEventListener('locationchange', navigationHandler);
+        
+        this.startUrlWatcher();
     }
 
     /**
@@ -651,9 +668,6 @@ const initializeExtension = () => {
 // Initialize on DOM ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initializeExtension);
-} else {
-    // DOM is already loaded
-    initializeExtension();
 }
 
 // Also initialize on page load (for extra safety)
