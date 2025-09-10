@@ -5,10 +5,9 @@
     "description": "Shows how many extra minutes you have beyond required average time.",
     "permissions": ["activeTab", "scripting"],
     "content_scripts": [
-      {
-        "matches": ["https://workspace.tatvasoft.com/time-log/self"],
-        "js": ["content.js"]
-      }
+        {
+            "matches": ["https://workspace.tatvasoft.com/*"],
+            "js": ["content.js"]
+        }
     ]
-  }
-  
+}
