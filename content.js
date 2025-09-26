@@ -10,6 +10,7 @@ class WorkspaceTimeTracker {
     constructor() {
         this.config = {
             MONTHLY_AVG_TIME: "08:30",
+            HALF_DAY_TIME: "04:30",
             TARGET_URL: 'https://workspace.tatvasoft.com/time-log/self',
             ELEMENT_ID: "extra-minutes-result",
             DEBOUNCE_DELAY: 300,
@@ -95,25 +96,33 @@ class WorkspaceTimeTracker {
 
     calculateExtraMinutes() {
         const requiredPerDay = this.timeToMinutes(this.config.MONTHLY_AVG_TIME);
+        const halfDayTime = this.timeToMinutes(this.config.HALF_DAY_TIME);
         const tableRows = document.querySelectorAll('.table-card tbody tr');
         
         if (tableRows.length === 0) return null;
 
         let totalMinutes = 0;
+        let fullDayCount = 0;
+        let halfDayCount = 0;
         let dayCount = 0;
 
         tableRows.forEach(row => {
             const timeString = this.extractTimeFromRow(row);
+            const attendance = this.extractAttendance(row).toLowerCase();
             
             if (this.isValidTimeFormat(timeString)) {
                 totalMinutes += this.timeToMinutes(timeString);
                 dayCount++;
+
+                if (attendance.includes("half")) {
+                    halfDayCount++;
+                } else {
+                    fullDayCount++;
+                }
             }
         });
 
-        if (dayCount === 0) return null;
-
-        const extraMinutes = totalMinutes - (requiredPerDay * dayCount);
+        const extraMinutes = totalMinutes - (requiredPerDay * fullDayCount) - (halfDayTime * halfDayCount);
         
         return {
             extraMinutes,
@@ -134,6 +143,11 @@ class WorkspaceTimeTracker {
         }
         
         return timeString;
+    }
+
+    extractAttendance(row) {
+        const lastCell = row.querySelector('.cdk-column-Attendance .status-badge');
+        return lastCell?.textContent?.trim() || '';
     }
 
     isValidTimeFormat(timeStr) {
